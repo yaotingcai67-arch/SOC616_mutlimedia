@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nailoong Caught Me. Then What?</title>
+  <style>
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+    iframe { width: 100%; height: 100%; border: 0; display: block; }
+  </style>
+</head>
+<body>
+  <iframe id="site-frame" title="Nailoong interactive site" src="Cute%20Comfort/index.html"></iframe>
+  <script>
+    (function () {
+      const frame = document.getElementById('site-frame');
+
+      frame.addEventListener('load', function () {
+        try {
+          const frameDoc = frame.contentDocument;
+          if (!frameDoc) return;
+
+          const rewrites = {
+            'failed-exam.gif': 'failed-exam.GIF',
+            'wipe-out.gif': 'wipe-out.GIF',
+            'there-there.gif': 'there-there.GIF',
+            'compare.gif': 'compare.GIF',
+            'closing.gif': 'closing.GIF',
+            'sence.gif': 'sence.GIF'
+          };
+
+          frameDoc.querySelectorAll('img').forEach(function (img) {
+            const src = img.getAttribute('src');
+            if (!src) return;
+
+            // Fix Windows backslashes and other GIF case mismatches.
+            let corrected = src.replace(/\\/g, '/');
+            const lower = corrected.toLowerCase();
+            Object.keys(rewrites).forEach(function (wrongName) {
+              if (lower.endsWith(wrongName)) {
+                corrected = corrected.slice(0, corrected.toLowerCase().lastIndexOf(wrongName)) + rewrites[wrongName];
+              }
+            });
+            if (corrected !== src) img.setAttribute('src', corrected);
+          });
+
+          // Restore the closing GIF that is currently inside an HTML comment.
+          const closingGrid = frameDoc.querySelector('.closing-grid');
+          if (closingGrid && !closingGrid.querySelector('img[src*="closing"]')) {
+            const img = frameDoc.createElement('img');
+            img.src = 'assets/closing.GIF';
+            img.alt = 'Nailoong closing image';
+            img.className = 'user-img';
+            closingGrid.appendChild(img);
+          }
+
+          // Keep the iframe title and URL navigation behaviour coherent.
+          frameDoc.title = frameDoc.title || 'Nailoong Caught Me. Then What?';
+        } catch (error) {
+          console.error('GIF correction failed:', error);
+        }
+      });
+    }());
+  </script>
+</body>
+</html>
